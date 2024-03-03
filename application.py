@@ -1,37 +1,35 @@
 from flask import Flask
 
-app = Flask(__name__)
+# print a nice greeting.
+def say_hello(username="World"):
+    return '<p>Hello %s!</p>\n' % username
 
-@app.route("/")
-def index():
-    html_content = """
-    <!DOCTYPE html>
-    <html lang="en">
-       <head>
-          <meta charset="UTF-8" />
-          <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-          <title>Document</title>
-          <style>
-             body {
-                background-color: black;
-                font-family: Arial, sans-serif;
-                margin: 0;
-                padding: 0;
-             }
-             p {
-                color: gold;
-                font-size: 48px;
-                text-align: center;
-                margin-top: 200px;
-             }
-          </style>
-       </head>
-       <body>
-          <p>Hello world!</p>
-       </body>
-    </html>
-    """
-    return html_content
+# some bits of text for the page.
+header_text = '''
+    <html>\n<head> <title>EB Flask Test</title> </head>\n<body>'''
+instructions = '''
+    <p><em>Hint</em>: This is a RESTful web service! Append a username
+    to the URL (for example: <code>/Thelonious</code>) to say hello to
+    someone specific.</p>\n'''
+home_link = '<p><a href="/">Back</a></p>\n'
+footer_text = '</body>\n</html>'
 
+# EB looks for an 'application' callable by default.
+application = Flask(__name__)
+
+# add a rule for the index page.
+application.add_url_rule('/', 'index', (lambda: header_text +
+    say_hello() + instructions + footer_text))
+
+# add a rule when the page is accessed with a name appended to the site
+# URL.
+application.add_url_rule('/<username>', 'hello', (lambda username:
+    header_text + say_hello(username) + home_link + footer_text))
+
+# Setting debug to True enables debug output. This line should be
+# removed before deploying a production app.
+application.debug = True
+
+# run the app.
 if __name__ == "__main__":
-    app.run(debug=True)
+    application.run()
